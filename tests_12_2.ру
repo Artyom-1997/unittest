@@ -1,0 +1,62 @@
+class Runner:
+    def __init__(self, name, speed):
+        self.name = name
+        self.speed = speed
+
+    def __eq__(self, other):
+        return self.name == other.name
+
+    def run(self, distance):
+        return distance / self.speed
+
+    def walk(self, distance):
+        return distance / (self.speed / 2)  # Предположим, что скорость при ходьбе в два раза меньше
+
+
+class Tournament:
+    def __init__(self, distance, runners):
+        self.distance = distance
+        self.runners = runners
+
+    def start(self):
+        results = {}
+        for runner in self.runners:
+            time = runner.run(self.distance)
+            results[time] = runner.name
+        sorted_results = dict(sorted(results.items()))  # Сортируем по времени
+        return sorted_results
+
+
+class TournamentTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.all_results = {}
+
+    def setUp(self):
+        self.runner1 = Runner("Усэйн", 10)
+        self.runner2 = Runner("Андрей", 9)
+        self.runner3 = Runner("Ник", 3)
+
+    @classmethod
+    def tearDownClass(cls):
+        for key in sorted(cls.all_results.keys()):
+            print(f"{key}: {cls.all_results[key]}")
+
+    def test_race_usain_nick(self):
+        tournament = Tournament(90, [self.runner1, self.runner3])
+        self.all_results = tournament.start()
+        self.assertEqual(self.all_results[max(self.all_results)], "Усэйн")
+
+    def test_race_andrey_nick(self):
+        tournament = Tournament(90, [self.runner2, self.runner3])
+        self.all_results = tournament.start()
+        self.assertEqual(self.all_results[max(self.all_results)], "Андрей")
+
+    def test_race_usain_andrey_nick(self):
+        tournament = Tournament(90, [self.runner1, self.runner2, self.runner3])
+        self.all_results = tournament.start()
+        self.assertEqual(self.all_results[max(self.all_results)], "Усэйн")  # Исправлено на "Усэйн", так как он быстрее
+
+
+if __name__ == '__main__':
+    unittest.main()
